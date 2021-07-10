@@ -1,0 +1,3 @@
+
+sangtoolbox:
+	go install ./sangtool

@@ -1,6 +1,9 @@
 package main
 
-import "github.com/spf13/cobra"
+import (
+	"com.samderlust/sangtoolbox/sangtool/command"
+	"github.com/spf13/cobra"
+)
 
 func rootCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -10,6 +13,8 @@ func rootCommand() *cobra.Command {
 	}
 
 	cmd.SetVersionTemplate("sangtool CLI v{{.Version}}\n")
+
+	cmd.AddCommand(command.FlutterCreate())
 
 	return cmd
 }

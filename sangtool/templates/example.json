@@ -1,0 +1,5 @@
+{
+    "lib":[
+        "screens","widgets","utils","providers"
+    ]
+}
