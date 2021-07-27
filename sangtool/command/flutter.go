@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 
 	"com.samderlust/sangtoolbox/sangtool/utils"
 	"github.com/pkg/errors"
@@ -36,14 +35,9 @@ func FlutterCreate() *cobra.Command {
 			template, _ := cmd.Flags().GetString(templateFlag)
 			path := filepath.Join(cwd, name)
 
-			_, b, _, _ := runtime.Caller(0)
-			basepath := filepath.Join(filepath.Dir(b), "../..")
-			templatePath := filepath.Join(basepath, fmt.Sprintf("sangtool/templates/%s.json", template))
-
-			// check template exist
-			_, err = os.Stat(templatePath)
-			if os.IsNotExist(err) {
-				return errors.New("template file does not exist")
+			templatePath, err := utils.GetTemplateDir(template)
+			if err != nil {
+				return err
 			}
 
 			// run flutter create

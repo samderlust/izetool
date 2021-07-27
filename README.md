@@ -15,4 +15,4 @@ At the moment, sangtoolbox only support creating flutter project.
 
 2. provide the template file in `template` folder. Must be a json file
 3. run `make sangtoolbox` in the root folder to install the toolbox into your system
-4. run `sangtool flutter_create <name> --template=<template.json>`. if `--template` is not provide, the `example.json` will be used as default template.
+4. run `sangtool flutter_create <name> --template=<template.json>`. if `--template` is not provide, the `example` will be used as default template.
