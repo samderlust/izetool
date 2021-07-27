@@ -11,7 +11,6 @@ import (
 )
 
 func CreateDirsRecursive(template interface{}, cwd string) error {
-	fmt.Println("in crate")
 	var mapType map[string]interface{}
 	var arrType []interface{}
 
