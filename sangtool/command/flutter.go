@@ -40,8 +40,14 @@ func FlutterCreate() *cobra.Command {
 			basepath := filepath.Join(filepath.Dir(b), "../..")
 			templatePath := filepath.Join(basepath, fmt.Sprintf("sangtool/templates/%s.json", template))
 
-			createCmd := exec.Command("flutter", "create", name)
+			// check template exist
+			_, err = os.Stat(templatePath)
+			if os.IsNotExist(err) {
+				return errors.New("template file does not exist")
+			}
 
+			// run flutter create
+			createCmd := exec.Command("flutter", "create", name)
 			utils.TaskWrapper(
 				fmt.Sprintf("Creating Flutter Project: %s ", name),
 				func() error {
@@ -49,15 +55,14 @@ func FlutterCreate() *cobra.Command {
 				},
 			)
 
+			//read from json template file and create files and folders
 			templFile, err := ioutil.ReadFile(templatePath)
-
 			if err != nil {
 				return errors.Wrap(err, "failed to read template file")
 			}
 
 			var data interface{}
 			err = json.Unmarshal(templFile, &data)
-
 			if err != nil {
 				return errors.Wrap(err, "reading json err")
 			}
