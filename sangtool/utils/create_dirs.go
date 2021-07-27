@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// CreateDirsRecursive create folders and files follow provided template
 func CreateDirsRecursive(template interface{}, cwd string) error {
 	var mapType map[string]interface{}
 	var arrType []interface{}

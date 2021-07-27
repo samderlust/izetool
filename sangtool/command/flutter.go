@@ -8,10 +8,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	"com.samderlust/sangtoolbox/sangtool/utils"
-	"github.com/briandowns/spinner"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -44,19 +42,12 @@ func FlutterCreate() *cobra.Command {
 
 			createCmd := exec.Command("flutter", "create", name)
 
-			createSpinner := spinner.New(spinner.CharSets[35], 100*time.Millisecond)
-			createSpinner.Prefix = (fmt.Sprintf("Creating Flutter Project: %s ", name))
-			createSpinner.Start()
-
-			if err := createCmd.Run(); err != nil {
-				fmt.Println(err)
-				fmt.Println("failed creating Flutter project")
-				createSpinner.Stop()
-				return err
-			}
-			createSpinner.Stop()
-
-			fmt.Println("\nFlutter project created!!")
+			utils.TaskWrapper(
+				fmt.Sprintf("Creating Flutter Project: %s ", name),
+				func() error {
+					return createCmd.Run()
+				},
+			)
 
 			templFile, err := ioutil.ReadFile(templatePath)
 
@@ -71,18 +62,13 @@ func FlutterCreate() *cobra.Command {
 				return errors.Wrap(err, "reading json err")
 			}
 
-			tempSpinner := spinner.New(spinner.CharSets[35], 100*time.Millisecond)
+			utils.TaskWrapper(
+				fmt.Sprintf("Create template: %s ", template),
+				func() error {
+					return utils.CreateDirsRecursive(data, path)
+				},
+			)
 
-			tempSpinner.Prefix = (fmt.Sprintf("Creating template: %s ", template))
-			tempSpinner.Start()
-
-			if err := utils.CreateDirsRecursive(data, path); err != nil {
-				fmt.Println("\nFailed creating template")
-				return err
-			}
-
-			tempSpinner.Stop()
-			fmt.Println("\nCreating template finished")
 			return nil
 		},
 	}
