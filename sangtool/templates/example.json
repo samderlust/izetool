@@ -1,5 +1,13 @@
 {
     "lib":[
-        "screens","widgets","utils","providers"
+        "screens",
+        "widgets",
+        "utils",
+        "providers"
+    ],
+    "lib/screens":[
+        "home_screen.dart",
+        "feed_screen.dart",
+        "menu_screen.dart"
     ]
 }
