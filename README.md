@@ -18,7 +18,7 @@ At the moment, sangtoolbox only support creating flutter project.
 
 # Avaialable commands
 
-| command        | usage                                                  | note                                                                                 |
-| -------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| flutter_create | `sangtool flutter_create <name> --template=<template>` | if `--template` is not provide, the `example.json` will be used as default template. |
-|                |                                                        |
+| command        | usage                                                                                      | note                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| flutter_create | `sangtool flutter_create <name> --template=<template>` or `sangtool flutter_create <name>` | if `--template` is not provide, the `example.json` will be used as default template. |
+|                |                                                                                            |

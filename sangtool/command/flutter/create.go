@@ -1,4 +1,4 @@
-package command
+package flutter
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ const (
 //FlutterCreate create flutter project and customized folders
 func FlutterCreate() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "flutter_create <name>",
+		Use:   "create <name>",
 		Short: "create a new Flutter project",
 		Long:  `create a new Flutter project and template folder`,
 		Args:  cobra.ExactArgs(1),

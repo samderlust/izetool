@@ -13,8 +13,7 @@ func rootCommand() *cobra.Command {
 	}
 
 	cmd.SetVersionTemplate("sangtool CLI v{{.Version}}\n")
-
-	cmd.AddCommand(command.FlutterCreate())
+	cmd.AddCommand(command.FlutterCmd())
 
 	return cmd
 }
