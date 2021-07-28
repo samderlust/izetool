@@ -5,6 +5,8 @@ The tool box helps run commandline to create your project and then create folder
 
 At the moment, sangtoolbox only support creating flutter project.
 
+#### support: Linux, MacOS
+
 # Install
 
 1. Clone the project
@@ -16,7 +18,7 @@ At the moment, sangtoolbox only support creating flutter project.
 2. provide the template file in `template` folder. Must be a json file
 3. run `make sangtoolbox` in the root folder to install the toolbox into your system
 
-# Avaialable commands
+# Available commands
 
 | command        | usage                                                                                      | note                                                                                 |
 | -------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
