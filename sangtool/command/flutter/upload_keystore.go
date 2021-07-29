@@ -1,16 +1,40 @@
 package flutter
 
 import (
+	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-const ()
+const (
+	replacement1 = `
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+	keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+	`
+	replacement2 = `
+	signingConfigs {
+		release {
+			keyAlias keystoreProperties['keyAlias']
+			keyPassword keystoreProperties['keyPassword']
+			storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+			storePassword keystoreProperties['storePassword']
+		}
+	}
+	buildTypes {`
+	replacement3 = `signingConfig signingConfigs.release`
+)
 
 // keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 
@@ -35,6 +59,7 @@ func UploadKeystore() *cobra.Command {
 			genkey.Stderr = os.Stderr
 			genkey.Stdin = os.Stdin
 			genkey.Stdout = os.Stdout
+			//TODO: handle existing keyfile
 			err := genkey.Run()
 			if err != nil {
 				return errors.Wrap(err, "err execute")
@@ -43,6 +68,10 @@ func UploadKeystore() *cobra.Command {
 			if err := createKeyFile(); err != nil {
 				return errors.Wrap(err, "err create key file")
 			}
+
+			if err := modifyBuildGradle(); err != nil {
+				return err
+			}
 			return nil
 		},
 	}
@@ -50,6 +79,7 @@ func UploadKeystore() *cobra.Command {
 }
 
 func createKeyFile() error {
+	homeDir, _ := os.UserHomeDir()
 	cwd, err := os.Getwd()
 	if err != nil {
 		return errors.Wrap(err, "failed to Getwd")
@@ -63,12 +93,40 @@ func createKeyFile() error {
 
 	defer keyFile.Close()
 
-	fmt.Print("Enter password from previous step")
-	var input string
-	fmt.Sprintln(&input)
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter password from previous step: ")
+	password, _ := reader.ReadString('\n')
+	trimmedPassword := strings.Trim(password, "\n")
 
 	keyFile.WriteString(
-		fmt.Sprintf("storePassword=%s\nkeyPassword=%s\nkeyAlias=upload\nstoreFile=~/upload-keystore.jks", input, input))
+		fmt.Sprintf("storePassword=%s\nkeyPassword=%s\nkeyAlias=upload\nstoreFile=%s",
+			trimmedPassword,
+			trimmedPassword,
+			filepath.Join(homeDir, "/upload-keystore.jks"),
+		),
+	)
+
+	return nil
+}
+
+func modifyBuildGradle() error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return errors.Wrap(err, "failed to Getwd")
+	}
+
+	buildGradlePath := filepath.Join(cwd, "/android/app/build.gradle")
+
+	data, _ := ioutil.ReadFile(buildGradlePath)
+
+	updatedContent := strings.Replace(string(data), "android {", replacement1, 1)
+	updatedContent = strings.Replace(updatedContent, "buildTypes {", replacement2, 1)
+	updatedContent = strings.Replace(updatedContent, "signingConfig signingConfigs.debug", replacement3, 1)
+
+	err = ioutil.WriteFile(buildGradlePath, []byte(updatedContent), 0644)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
