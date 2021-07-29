@@ -20,7 +20,7 @@ At the moment, sangtoolbox only support creating flutter project.
 
 # Available commands
 
-| command        | usage                                                                                      | note                                                                                 |
-| -------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| flutter_create | `sangtool flutter_create <name> --template=<template>` or `sangtool flutter_create <name>` | if `--template` is not provide, the `example.json` will be used as default template. |
-|                |                                                                                            |
+| command                | usage                                                                                      | note                                                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| flutter create         | `sangtool flutter_create <name> --template=<template>` or `sangtool flutter_create <name>` | if `--template` is not provide, the `example.json` will be used as default template.                                              |
+| flutter uploadkeystore | `sangtool flutter uploadkeystore`                                                          | process to create android upload keystore. After that, create `key.properties` file and also modify your `app/build.gradle` file. |
