@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -34,48 +34,123 @@ android {
 	}
 	buildTypes {`
 	replacement3 = `signingConfig signingConfigs.release`
+
+	keystoreFlag = "keystoreflag"
+)
+
+var (
+	password string
 )
 
 // keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+
+/*
+-storepass
+CN=commonName
+OU=organizationUnit
+O=organizationName
+L=localityName
+S=stateName
+C=country */
 
 // UploadKeystore create keystore and modify build.gradle
 func UploadKeystore() *cobra.Command {
 	keystoreCmd := &cobra.Command{
 		Use:   "uploadkeystore",
 		Short: "create upload keystore for android",
-		Long:  "create upload keystore for android and modify build.gradle, all in one ",
+		Long:  "create upload keystore for android and modify build.gradle, all in one",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			homeDir, _ := os.UserHomeDir()
-			genkey := exec.Command(
-				"keytool",
-				// "-genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload",
-				"-genkey", "-v",
-				"-keystore", filepath.Join(homeDir, "/upload-keystore.jks"),
-				"-keyalg", "RSA", "-keysize", "2048",
-				"-validity", "10000", "-alias", "upload",
-			)
-			genkey.StderrPipe()
-			genkey.Stderr = os.Stderr
-			genkey.Stdin = os.Stdin
-			genkey.Stdout = os.Stdout
-			//TODO: handle existing keyfile
-			err := genkey.Run()
-			if err != nil {
-				return errors.Wrap(err, "err execute")
+			keyFromFLag, _ := cmd.Flags().GetString(keystoreFlag)
+
+			var keystorePath string
+			if strings.Contains("~/upload-keystore.jks", "~") {
+				log.Println("create in homedir")
+				homeDir, _ := os.UserHomeDir()
+				extractedPath := strings.Split(keyFromFLag, "~")[1]
+				fmt.Printf("extractedPath: %v\n", extractedPath)
+				keystorePath = filepath.Join(homeDir, extractedPath)
+			}
+			fmt.Printf("keystorePath: %v\n", keystorePath)
+
+			_, err := os.Stat(keystorePath)
+			if os.IsNotExist(err) {
+				log.Println("keystore file does not exist,")
+			} else {
+				log.Println("keystore file already exist, skip creating")
 			}
 
-			if err := createKeyFile(); err != nil {
-				return errors.Wrap(err, "err create key file")
-			}
+			// genkey := exec.Command(
+			// 	"keytool",
+			// 	// "-genkey -v -keystore ~/atestkey.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload",
+			// 	"-genkey", "-v",
+			// 	"-keystore", keystorePath,
+			// 	"-keyalg", "RSA", "-keysize", "2048",
+			// 	"-validity", "10000", "-alias", "upload",
+			// )
+			// genkey.StderrPipe()
+			// genkey.Stderr = os.Stderr
+			// genkey.Stdin = os.Stdin
+			// genkey.Stdout = os.Stdout
+			// //TODO: handle existing keyfile
+			// err = genkey.Run()
+			// if err != nil {
+			// 	return errors.Wrap(err, "err execute")
+			// }
 
-			if err := modifyBuildGradle(); err != nil {
-				return err
-			}
+			// if err := createKeyFile(); err != nil {
+			// 	return errors.Wrap(err, "err create key file")
+			// }
+
+			// if err := modifyBuildGradle(); err != nil {
+			// 	return err
+			// }
+
 			return nil
 		},
 	}
+	keystoreCmd.Flags().StringP(keystoreFlag, "s", "~/upload-keystore.jks", "place to store key")
+
 	return keystoreCmd
+}
+
+/*
+-storepass
+CN=commonName
+OU=organizationUnit
+O=organizationName
+L=localityName
+S=stateName
+C=country */
+func promptKeygenInput() (*string, error) {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Enter your new password: ")
+	password, _ = reader.ReadString('\n')
+	fmt.Print("Re-enter your new password: ")
+	verifyPassword, _ := reader.ReadString('\n')
+	if password != verifyPassword {
+		return nil, errors.New("Passwords don't match")
+	}
+
+	fmt.Print("Enter your name: ")
+	name, _ := reader.ReadString('\n')
+	fmt.Print("Enter your organization name: ")
+	organizationName, _ := reader.ReadString('\n')
+	fmt.Print("Enter your organization unit: ")
+	organizationUnit, _ := reader.ReadString('\n')
+	fmt.Print("Enter your city or locality: ")
+	city, _ := reader.ReadString('\n')
+	fmt.Print("Enter your state or province: ")
+	state, _ := reader.ReadString('\n')
+	fmt.Print("Enter two-letter country code: ")
+	country, _ := reader.ReadString('\n')
+
+	genvalues := fmt.Sprintf("-storepass %s -dname 'CN=%s OU=%s O=%s L=%s S=%s C=%s'",
+		password, name, organizationUnit, organizationName, city, state, country,
+	)
+
+	return &genvalues, nil
 }
 
 func createKeyFile() error {
@@ -93,9 +168,9 @@ func createKeyFile() error {
 
 	defer keyFile.Close()
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter password from previous step: ")
-	password, _ := reader.ReadString('\n')
+	// reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter password for your keystore file: ")
+	// password, _ := reader.ReadString('\n')
 	trimmedPassword := strings.Trim(password, "\n")
 
 	keyFile.WriteString(
