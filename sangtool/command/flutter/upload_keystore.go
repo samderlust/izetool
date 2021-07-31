@@ -6,11 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 const (
@@ -65,47 +67,53 @@ func UploadKeystore() *cobra.Command {
 
 			var keystorePath string
 			if strings.Contains("~/upload-keystore.jks", "~") {
-				log.Println("create in homedir")
 				homeDir, _ := os.UserHomeDir()
 				extractedPath := strings.Split(keyFromFLag, "~")[1]
 				fmt.Printf("extractedPath: %v\n", extractedPath)
 				keystorePath = filepath.Join(homeDir, extractedPath)
 			}
-			fmt.Printf("keystorePath: %v\n", keystorePath)
 
 			_, err := os.Stat(keystorePath)
-			if os.IsNotExist(err) {
-				log.Println("keystore file does not exist,")
-			} else {
+			if !os.IsNotExist(err) {
 				log.Println("keystore file already exist, skip creating")
+
+			} else {
+				if err := prompt2Passwords(); err != nil {
+					return err
+				}
+
+				out, err := promptKeygenInput()
+				if err != nil {
+					return err
+				}
+
+				genkey := exec.Command(
+					"keytool",
+					"-genkey", "-v",
+					"-keystore", keystorePath,
+					"-keyalg", "RSA", "-keysize", "2048",
+					"-validity", "10000", "-alias", "upload",
+					"-storepass", password,
+					"-dname", *out,
+				)
+
+				genkey.Stderr = os.Stderr
+				genkey.Stdin = os.Stdin
+				genkey.Stdout = os.Stdout
+
+				err = genkey.Run()
+				if err != nil {
+					return errors.Wrap(err, "err execute")
+				}
+
+			}
+			if err := createKeyFile(); err != nil {
+				return errors.Wrap(err, "err create key file")
 			}
 
-			// genkey := exec.Command(
-			// 	"keytool",
-			// 	// "-genkey -v -keystore ~/atestkey.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload",
-			// 	"-genkey", "-v",
-			// 	"-keystore", keystorePath,
-			// 	"-keyalg", "RSA", "-keysize", "2048",
-			// 	"-validity", "10000", "-alias", "upload",
-			// )
-			// genkey.StderrPipe()
-			// genkey.Stderr = os.Stderr
-			// genkey.Stdin = os.Stdin
-			// genkey.Stdout = os.Stdout
-			// //TODO: handle existing keyfile
-			// err = genkey.Run()
-			// if err != nil {
-			// 	return errors.Wrap(err, "err execute")
-			// }
-
-			// if err := createKeyFile(); err != nil {
-			// 	return errors.Wrap(err, "err create key file")
-			// }
-
-			// if err := modifyBuildGradle(); err != nil {
-			// 	return err
-			// }
-
+			if err := modifyBuildGradle(); err != nil {
+				return err
+			}
 			return nil
 		},
 	}
@@ -125,15 +133,7 @@ C=country */
 func promptKeygenInput() (*string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("Enter your new password: ")
-	password, _ = reader.ReadString('\n')
-	fmt.Print("Re-enter your new password: ")
-	verifyPassword, _ := reader.ReadString('\n')
-	if password != verifyPassword {
-		return nil, errors.New("Passwords don't match")
-	}
-
-	fmt.Print("Enter your name: ")
+	fmt.Print("\nEnter your name: ")
 	name, _ := reader.ReadString('\n')
 	fmt.Print("Enter your organization name: ")
 	organizationName, _ := reader.ReadString('\n')
@@ -146,11 +146,65 @@ func promptKeygenInput() (*string, error) {
 	fmt.Print("Enter two-letter country code: ")
 	country, _ := reader.ReadString('\n')
 
-	genvalues := fmt.Sprintf("-storepass %s -dname 'CN=%s OU=%s O=%s L=%s S=%s C=%s'",
-		password, name, organizationUnit, organizationName, city, state, country,
+	genvalues := fmt.Sprintf(
+		"CN=%s OU=%s O=%s L=%s S=%s C=%s",
+		strings.TrimSuffix(name, "\n"), strings.TrimSuffix(organizationUnit, "\n"),
+		strings.TrimSuffix(organizationName, "\n"), strings.TrimSuffix(city, "\n"),
+		strings.TrimSuffix(state, "\n"), strings.TrimSuffix(country, "\n"),
 	)
 
 	return &genvalues, nil
+}
+
+func prompt2Passwords() error {
+	attempt := 1
+	for {
+		if attempt > 3 {
+			log.Println("Too many failures - try later")
+			os.Exit(1)
+			break
+		}
+
+		promptAndVerifyPassword()
+
+		fmt.Print("\nRe-enter your new password: ")
+		input2, _ := term.ReadPassword(0)
+		verifyPassword := string(input2)
+
+		if password != verifyPassword {
+			log.Println("\nPasswords don't match")
+		} else if len(password) < 6 {
+			log.Println("\nPassword must have at least 6 letters")
+		} else {
+			break
+		}
+		attempt++
+	}
+
+	return nil
+}
+
+func promptAndVerifyPassword() error {
+	attempt := 1
+	for {
+		if attempt > 3 {
+			log.Println("Too many failures - try later")
+			os.Exit(1)
+			break
+		}
+
+		fmt.Print("Enter your new password: ")
+		input1, _ := term.ReadPassword(0)
+		if len(input1) < 6 {
+			log.Println("\nPassword must have at least 6 letters")
+		} else {
+			password = string(input1)
+			break
+		}
+
+		attempt++
+	}
+	return nil
 }
 
 func createKeyFile() error {
@@ -168,15 +222,17 @@ func createKeyFile() error {
 
 	defer keyFile.Close()
 
-	// reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter password for your keystore file: ")
-	// password, _ := reader.ReadString('\n')
-	trimmedPassword := strings.Trim(password, "\n")
+	if len(password) == 0 {
+
+		fmt.Print("Enter password for your keystore file: ")
+		input1, _ := term.ReadPassword(0)
+		password = string(input1)
+	}
 
 	keyFile.WriteString(
 		fmt.Sprintf("storePassword=%s\nkeyPassword=%s\nkeyAlias=upload\nstoreFile=%s",
-			trimmedPassword,
-			trimmedPassword,
+			password,
+			password,
 			filepath.Join(homeDir, "/upload-keystore.jks"),
 		),
 	)
