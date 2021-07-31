@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"com.samderlust/sangtoolbox/sangtool/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -107,13 +108,23 @@ func UploadKeystore() *cobra.Command {
 				}
 
 			}
+
+			utils.LogDone("keygen successful")
+
+			utils.LogStart("create key.properties")
 			if err := createKeyFile(); err != nil {
 				return errors.Wrap(err, "err create key file")
 			}
 
-			if err := modifyBuildGradle(); err != nil {
-				return err
-			}
+			utils.LogDone("key.properties created")
+
+			utils.TaskWrapper(
+				"Modify build.gradle",
+				func() error { return modifyBuildGradle() },
+			)
+			// if err := modifyBuildGradle(); err != nil {
+			// 	return err
+			// }
 			return nil
 		},
 	}
@@ -223,7 +234,6 @@ func createKeyFile() error {
 	defer keyFile.Close()
 
 	if len(password) == 0 {
-
 		fmt.Print("Enter password for your keystore file: ")
 		input1, _ := term.ReadPassword(0)
 		password = string(input1)

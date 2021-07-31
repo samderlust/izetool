@@ -10,7 +10,7 @@ import (
 
 func TaskWrapper(taskName string, task func() error) error {
 	theSpinner := spinner.New(spinner.CharSets[33], 100*time.Millisecond)
-	theSpinner.Prefix = fmt.Sprintf("▶️  %s: RUNNING ", taskName)
+	theSpinner.Prefix = fmt.Sprintf("\n▶️  %s: RUNNING ", taskName)
 	theSpinner.FinalMSG = fmt.Sprintf("\n✅  %s: COMPLETED", taskName)
 	theSpinner.Start()
 	if err := task(); err != nil {
