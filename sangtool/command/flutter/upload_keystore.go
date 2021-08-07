@@ -45,17 +45,6 @@ var (
 	password string
 )
 
-// keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-
-/*
--storepass
-CN=commonName
-OU=organizationUnit
-O=organizationName
-L=localityName
-S=stateName
-C=country */
-
 // UploadKeystore create keystore and modify build.gradle
 func UploadKeystore() *cobra.Command {
 	keystoreCmd := &cobra.Command{
@@ -77,36 +66,8 @@ func UploadKeystore() *cobra.Command {
 			_, err := os.Stat(keystorePath)
 			if !os.IsNotExist(err) {
 				log.Println("keystore file already exist, skip creating")
-
 			} else {
-				if err := prompt2Passwords(); err != nil {
-					return err
-				}
-
-				out, err := promptKeygenInput()
-				if err != nil {
-					return err
-				}
-
-				genkey := exec.Command(
-					"keytool",
-					"-genkey", "-v",
-					"-keystore", keystorePath,
-					"-keyalg", "RSA", "-keysize", "2048",
-					"-validity", "10000", "-alias", "upload",
-					"-storepass", password,
-					"-dname", *out,
-				)
-
-				genkey.Stderr = os.Stderr
-				genkey.Stdin = os.Stdin
-				genkey.Stdout = os.Stdout
-
-				err = genkey.Run()
-				if err != nil {
-					return errors.Wrap(err, "err execute")
-				}
-
+				createKeystoreJks(keystorePath)
 			}
 
 			utils.LogDone("keygen successful")
@@ -122,9 +83,7 @@ func UploadKeystore() *cobra.Command {
 				"Modify build.gradle",
 				func() error { return modifyBuildGradle() },
 			)
-			// if err := modifyBuildGradle(); err != nil {
-			// 	return err
-			// }
+
 			return nil
 		},
 	}
@@ -133,14 +92,40 @@ func UploadKeystore() *cobra.Command {
 	return keystoreCmd
 }
 
-/*
--storepass
-CN=commonName
-OU=organizationUnit
-O=organizationName
-L=localityName
-S=stateName
-C=country */
+func createKeystoreJks(keystorePath string) error {
+	if err := prompt2Passwords(); err != nil {
+		return err
+	}
+
+	out, err := promptKeygenInput()
+	if err != nil {
+		return err
+	}
+
+	genkey := exec.Command(
+		"keytool",
+		"-genkey", "-v",
+		"-keystore", keystorePath,
+		"-keyalg", "RSA",
+		"-keysize", "2048",
+		"-validity", "10000",
+		"-alias", "upload",
+		"-storepass", password,
+		"-dname", *out,
+	)
+
+	genkey.Stderr = os.Stderr
+	genkey.Stdin = os.Stdin
+	genkey.Stdout = os.Stdout
+
+	err = genkey.Run()
+	if err != nil {
+		return errors.Wrap(err, "err execute")
+	}
+
+	return nil
+}
+
 func promptKeygenInput() (*string, error) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -259,10 +244,18 @@ func modifyBuildGradle() error {
 	buildGradlePath := filepath.Join(cwd, "/android/app/build.gradle")
 
 	data, _ := ioutil.ReadFile(buildGradlePath)
+	var updatedContent string
+	if !strings.Contains(string(data), replacement1) {
+		updatedContent = strings.Replace(string(data), "android {", replacement1, 1)
+	}
 
-	updatedContent := strings.Replace(string(data), "android {", replacement1, 1)
-	updatedContent = strings.Replace(updatedContent, "buildTypes {", replacement2, 1)
-	updatedContent = strings.Replace(updatedContent, "signingConfig signingConfigs.debug", replacement3, 1)
+	if !strings.Contains(string(data), replacement2) {
+		updatedContent = strings.Replace(updatedContent, "buildTypes {", replacement2, 1)
+	}
+
+	if !strings.Contains(string(data), replacement3) {
+		updatedContent = strings.Replace(updatedContent, "signingConfig signingConfigs.debug", replacement3, 1)
+	}
 
 	err = ioutil.WriteFile(buildGradlePath, []byte(updatedContent), 0644)
 	if err != nil {
