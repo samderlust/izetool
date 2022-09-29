@@ -17,7 +17,7 @@ const (
 	templateFlag = "template"
 )
 
-//FlutterCreate create flutter project and customized folders
+// FlutterCreate create flutter project and customized folders
 func FlutterCreate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create <name>",

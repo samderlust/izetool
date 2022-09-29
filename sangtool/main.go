@@ -1,11 +1,10 @@
 package main
 
-import "log"
+import "com.samderlust/sangtoolbox/sangtool/command"
 
 func main() {
-	log.SetFlags(0)
 
-	rootCmd := rootCommand()
+	rootCmd := command.RootCommand()
 
 	// rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 	// 	return nil

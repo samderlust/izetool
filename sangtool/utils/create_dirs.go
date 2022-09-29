@@ -20,8 +20,8 @@ func CreateDirsRecursive(template interface{}, cwd string) error {
 	}
 
 	for key, val := range template.(map[string]interface{}) {
-		parrentPath := filepath.Join(cwd, key)
-		if err := os.MkdirAll(parrentPath, 0777); err != nil {
+		parentPath := filepath.Join(cwd, key)
+		if err := os.MkdirAll(parentPath, 0777); err != nil {
 			fmt.Println(err)
 		}
 
@@ -30,7 +30,7 @@ func CreateDirsRecursive(template interface{}, cwd string) error {
 		}
 
 		for _, v := range val.([]interface{}) {
-			childPath := filepath.Join(parrentPath, v.(string))
+			childPath := filepath.Join(parentPath, v.(string))
 			if strings.Contains(childPath, ".") {
 				_, err := os.Create(childPath)
 				if err != nil {
