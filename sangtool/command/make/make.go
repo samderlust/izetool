@@ -28,7 +28,7 @@ func Make() *cobra.Command {
 				return errors.Wrap(err, "failed to Getwd")
 			}
 
-			templatePath, err := utils.GetTemplateFile(template)
+			templatePath, err := utils.GetTemplateFilePath(template)
 			if err != nil {
 				return errors.Wrap(err, "failed to template file")
 			}

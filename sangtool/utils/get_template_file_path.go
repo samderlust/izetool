@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func GetTemplateFile(name string) (string, error) {
+func GetTemplateFilePath(name string) (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", nil

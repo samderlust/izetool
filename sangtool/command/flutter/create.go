@@ -34,7 +34,7 @@ func FlutterCreate() *cobra.Command {
 			template, _ := cmd.Flags().GetString(templateFlag)
 			path := filepath.Join(cwd, name)
 
-			templatePath, err := utils.GetTemplateDir(template)
+			templatePath, err := utils.GetTemplateFilePath(template)
 			if err != nil {
 				return err
 			}

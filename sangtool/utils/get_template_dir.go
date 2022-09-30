@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GetTemplateDir get template path
+// GetTemplateSangToolFile get template path
 // return err if template file doesn't exist
-func GetTemplateDir(template string) (string, error) {
+func GetTemplateSangToolFile(template string) (string, error) {
 	_, b, _, _ := runtime.Caller(0)
 	basePath := filepath.Join(filepath.Dir(b), "../..")
 	templatePath := filepath.Join(basePath, fmt.Sprintf("sangtool/templates/%s.json", template))
