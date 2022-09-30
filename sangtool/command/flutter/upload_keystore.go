@@ -3,7 +3,6 @@ package flutter
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -142,14 +141,14 @@ func promptKeygenInput() (*string, error) {
 	fmt.Print("Enter two-letter country code: ")
 	country, _ := reader.ReadString('\n')
 
-	genvalues := fmt.Sprintf(
+	genValues := fmt.Sprintf(
 		"CN=%s OU=%s O=%s L=%s S=%s C=%s",
 		strings.TrimSuffix(name, "\n"), strings.TrimSuffix(organizationUnit, "\n"),
 		strings.TrimSuffix(organizationName, "\n"), strings.TrimSuffix(city, "\n"),
 		strings.TrimSuffix(state, "\n"), strings.TrimSuffix(country, "\n"),
 	)
 
-	return &genvalues, nil
+	return &genValues, nil
 }
 
 func prompt2Passwords() error {
@@ -243,7 +242,7 @@ func modifyBuildGradle() error {
 
 	buildGradlePath := filepath.Join(cwd, "/android/app/build.gradle")
 
-	data, _ := ioutil.ReadFile(buildGradlePath)
+	data, _ := os.ReadFile(buildGradlePath)
 	var updatedContent string
 	if !strings.Contains(string(data), replacement1) {
 		updatedContent = strings.Replace(string(data), "android {", replacement1, 1)
@@ -257,7 +256,7 @@ func modifyBuildGradle() error {
 		updatedContent = strings.Replace(updatedContent, "signingConfig signingConfigs.debug", replacement3, 1)
 	}
 
-	err = ioutil.WriteFile(buildGradlePath, []byte(updatedContent), 0644)
+	err = os.WriteFile(buildGradlePath, []byte(updatedContent), 0644)
 	if err != nil {
 		return err
 	}

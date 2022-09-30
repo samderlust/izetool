@@ -3,6 +3,7 @@ package command
 import (
 	"com.samderlust/sangtoolbox/sangtool/command/flutter"
 	"com.samderlust/sangtoolbox/sangtool/command/inits"
+	"com.samderlust/sangtoolbox/sangtool/command/make"
 	"github.com/spf13/cobra"
 )
 
@@ -23,6 +24,7 @@ func RootCommand() *cobra.Command {
 	cmd.SetVersionTemplate("sangtool CLI v{{.Version}}\n")
 	cmd.AddCommand(inits.InitSangTool())
 	cmd.AddCommand(flutter.FlutterCmd())
+	cmd.AddCommand(make.Make())
 
 	return cmd
 }

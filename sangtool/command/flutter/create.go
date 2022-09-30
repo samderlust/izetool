@@ -3,7 +3,6 @@ package flutter
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -50,7 +49,7 @@ func FlutterCreate() *cobra.Command {
 			)
 
 			//read from json template file and create files and folders
-			templFile, err := ioutil.ReadFile(templatePath)
+			templFile, err := os.ReadFile(templatePath)
 			if err != nil {
 				return errors.Wrap(err, "failed to read template file")
 			}
@@ -72,7 +71,7 @@ func FlutterCreate() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringP(templateFlag, "t", "example", "the tamplate that will be use, default to example")
+	cmd.Flags().StringP(templateFlag, "t", "example", "the template that will be use, default to example")
 
 	return cmd
 
