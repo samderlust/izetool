@@ -1,15 +1,15 @@
 package command
 
 import (
-	"com.samderlust/izetool/izetool/command/flutter"
-	"com.samderlust/izetool/izetool/command/inits"
-	"com.samderlust/izetool/izetool/command/make"
+	"com.samderlust/izetool/ize/command/flutter"
+	"com.samderlust/izetool/ize/command/inits"
+	"com.samderlust/izetool/ize/command/make"
 	"github.com/spf13/cobra"
 )
 
 func RootCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "sangtool",
+		Use:     "ize",
 		Short:   "Tools to help you push up progress",
 		Version: "0.0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -21,8 +21,8 @@ func RootCommand() *cobra.Command {
 		},
 	}
 
-	cmd.SetVersionTemplate("sangtool CLI v{{.Version}}\n")
-	cmd.AddCommand(inits.InitSangTool())
+	cmd.SetVersionTemplate("ize CLI v{{.Version}}\n")
+	cmd.AddCommand(inits.InitIzeTool())
 	cmd.AddCommand(flutter.FlutterCmd())
 	cmd.AddCommand(make.Make())
 

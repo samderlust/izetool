@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"com.samderlust/izetool/izetool/utils"
+	"com.samderlust/izetool/ize/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"

@@ -8,12 +8,12 @@ import (
 	"runtime"
 	"time"
 
-	"com.samderlust/izetool/izetool/utils"
+	"com.samderlust/izetool/ize/utils"
 	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
 )
 
-func InitSangTool() *cobra.Command {
+func InitIzeTool() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "create templates folder",

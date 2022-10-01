@@ -1,3 +1,3 @@
 
-sangtoolbox:
-	go install ./sangtool
+izetool:
+	go install ./ize
