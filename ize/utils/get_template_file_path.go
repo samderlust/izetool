@@ -12,7 +12,7 @@ func GetTemplateFilePath(name string) (string, error) {
 		return "", nil
 	}
 
-	toolDir := filepath.Join(home, "sangtool_templates")
+	toolDir := filepath.Join(home, "ize_templates")
 	os.Mkdir(toolDir, 0777)
 
 	exPath := filepath.Join(toolDir, fmt.Sprintf("%s.json", name))

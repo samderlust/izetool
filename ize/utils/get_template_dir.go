@@ -14,7 +14,7 @@ import (
 func GetTemplateSangToolFile(template string) (string, error) {
 	_, b, _, _ := runtime.Caller(0)
 	basePath := filepath.Join(filepath.Dir(b), "../..")
-	templatePath := filepath.Join(basePath, fmt.Sprintf("sangtool/templates/%s.json", template))
+	templatePath := filepath.Join(basePath, fmt.Sprintf("ize/templates/%s.json", template))
 	// check template exist
 	_, err := os.Stat(templatePath)
 	if os.IsNotExist(err) {
