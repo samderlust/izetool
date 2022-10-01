@@ -1,9 +1,9 @@
 package command
 
 import (
-	"com.samderlust/sangtoolbox/sangtool/command/flutter"
-	"com.samderlust/sangtoolbox/sangtool/command/inits"
-	"com.samderlust/sangtoolbox/sangtool/command/make"
+	"com.samderlust/izetool/izetool/command/flutter"
+	"com.samderlust/izetool/izetool/command/inits"
+	"com.samderlust/izetool/izetool/command/make"
 	"github.com/spf13/cobra"
 )
 

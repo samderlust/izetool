@@ -1,6 +1,6 @@
 package main
 
-import "com.samderlust/sangtoolbox/sangtool/command"
+import "com.samderlust/izetool/izetool/command"
 
 func main() {
 

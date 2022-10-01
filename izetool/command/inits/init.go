@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"time"
 
-	"com.samderlust/sangtoolbox/sangtool/utils"
+	"com.samderlust/izetool/izetool/utils"
 	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
 )

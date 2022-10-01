@@ -1,4 +1,4 @@
-module com.samderlust/sangtoolbox
+module com.samderlust/izetool
 
 go 1.18
 

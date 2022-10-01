@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"com.samderlust/sangtoolbox/sangtool/utils"
+	"com.samderlust/izetool/izetool/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
