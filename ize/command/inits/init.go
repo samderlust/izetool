@@ -29,16 +29,21 @@ func InitIzeTool() *cobra.Command {
 				log.Fatal(err)
 			}
 
-			toolDir := filepath.Join(home, "sangtool_templates")
+			toolDir := filepath.Join(home, "ize_templates")
 			os.Mkdir(toolDir, 0777)
 
 			exPath := filepath.Join(toolDir, "example.json")
+			makeExPath := filepath.Join(toolDir, "make_example.json")
 
 			_, b, _, _ := runtime.Caller(0)
 			basePath := filepath.Join(filepath.Dir(b), "../..")
 			templatePath := filepath.Join(basePath, "templates/example.json")
+			makeTemplatePath := filepath.Join(basePath, "templates/make_example.json")
 
 			if err := utils.CopyFile(templatePath, exPath); err != nil {
+				log.Fatal(err)
+			}
+			if err := utils.CopyFile(makeTemplatePath, makeExPath); err != nil {
 				log.Fatal(err)
 			}
 			theSpinner.Stop()

@@ -15,7 +15,7 @@ At the moment, izetool only support creating flutter project.
    	git clone https://github.com/samderlust/izetool.git
    ```
 
-2. provide the template file in `template` folder. Must be a json file
+2. provide the template file in `template` folder at `~/ize_templates`. Must be a json file
 3. run `make izetool` in the root folder to install the toolbox into your system
 
 # Available commands
@@ -24,3 +24,4 @@ At the moment, izetool only support creating flutter project.
 | ---------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | flutter create         | `ize flutter_create <name> --template=<template>` or `ize flutter_create <name>` | if `--template` is not provide, the `example.json` will be used as default template.                                              |
 | flutter uploadkeystore | `ize flutter uploadkeystore`                                                     | process to create android upload keystore. After that, create `key.properties` file and also modify your `app/build.gradle` file. |
+| make                   | `ize make <template> --name=<name>`                                              | must provide a template                                                                                                           |
