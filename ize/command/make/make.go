@@ -15,12 +15,14 @@ const (
 )
 
 func Make() *cobra.Command {
+	var flags []string
 	cmd := &cobra.Command{
 		Use:   "make <template>",
 		Short: "make files and folders",
 		Long:  "make files and folder recursively with provided template",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			template := args[0]
 
 			cwd, err := os.Getwd()
@@ -44,19 +46,24 @@ func Make() *cobra.Command {
 				return errors.Wrap(err, "reading json err")
 			}
 
-			theName, _ := cmd.Flags().GetString(nameFlag)
+			flagMap := map[string]string{}
+
+			for i, v := range flags {
+				key := fmt.Sprintf("s%v", i+1)
+				flagMap[key] = v
+			}
 
 			utils.TaskWrapper(
 				fmt.Sprintf("Create template: %s ", template),
 				func() error {
-					return utils.CreateDirsRecursiveWithName(data, map[string]string{nameFlag: theName}, cwd)
+					return utils.CreateDirsRecursiveWithName(data, flagMap, cwd)
 				},
 			)
 
 			return nil
 		},
 	}
-	cmd.Flags().StringP(nameFlag, "n", "example", "the template that will be use, default to example")
+	cmd.Flags().StringSliceVarP(&flags, nameFlag, "n", []string{}, "the template that will be use, default to example")
 
 	return cmd
 }

@@ -1,4 +1,4 @@
 {
-  "{{name}}": ["{{name}}_1", "{{name}}_2", "{{name}}thisqfd1"],
-  "{{name}}/{{name}}_1": ["dfsf.jsx", "{{name}}ok.go"]
+  "{{s1}}": ["{{s1}}_1", "{{s1}}_2", "{{s1}}thisqfd1"],
+  "{{s1}}/{{s1}}_1": ["dfsf.jsx", "{{s2}}ok.go"]
 }

@@ -20,8 +20,8 @@ At the moment, izetool only support creating flutter project.
 
 # Available commands
 
-| command                | usage                                                                            | note                                                                                                                              |
-| ---------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| flutter create         | `ize flutter_create <name> --template=<template>` or `ize flutter_create <name>` | if `--template` is not provide, the `example.json` will be used as default template.                                              |
-| flutter uploadkeystore | `ize flutter uploadkeystore`                                                     | process to create android upload keystore. After that, create `key.properties` file and also modify your `app/build.gradle` file. |
-| make                   | `ize make <template> --name=<name>`                                              | must provide a template.`<template>` is the same as file name                                                                     |
+| command                | usage                                                                            | note                                                                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| flutter create         | `ize flutter_create <name> --template=<template>` or `ize flutter_create <name>` | if `--template` is not provide, the `example.json` will be used as default template.                                                                     |
+| flutter uploadkeystore | `ize flutter uploadkeystore`                                                     | process to create android upload keystore. After that, create `key.properties` file and also modify your `app/build.gradle` file.                        |
+| make                   | `ize make <template> --name=<name-list>`                                         | - must provide a template.`<template>` is the same as file name. <br> - variable must be `s<<order>>`. order of variable is the other of the list `name` |
