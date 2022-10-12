@@ -3,8 +3,6 @@
 This is an opensource project to create an toolbox that help you saving time with boiledplate. Whatever your projects is.
 The tool box helps run commandline to create your project and then create folders and files as follow the structure you provide
 
-At the moment, izetool only support creating flutter project.
-
 #### support: Linux, MacOS
 
 # Install
